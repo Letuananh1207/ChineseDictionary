@@ -20,7 +20,7 @@ class _ImageLobbyState extends State<ImageLobby> {
           children: [
             _buildCard(
               title: "Lịch sử tìm kiếm",
-              imagePath: "animal_tiger.png", // Icon lịch sử tìm kiếm
+              imagePath: "logo.png", // Icon lịch sử tìm kiếm
               child: _buildHistoryList(),
             ),
           ],

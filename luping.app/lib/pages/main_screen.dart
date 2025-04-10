@@ -68,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
                             'assets/home.svg', 'Tra cứu', 0)),
                     Expanded(
                         child: _buildCustomBottomNavigationBarItem(
-                            'assets/notebook.svg', 'Tài liệu', 1)),
+                            'assets/notebook.svg', 'Thư viện', 1)),
                     Expanded(
                         child: _buildCustomBottomNavigationBarItem(
                             'assets/flashcard.svg', 'Thẻ nhớ', 2)),

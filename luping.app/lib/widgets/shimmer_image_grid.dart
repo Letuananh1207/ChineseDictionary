@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:luping/pages/courses/course-detail-page.dart';
+
 
 class ShimmerImageGrid extends StatefulWidget {
   const ShimmerImageGrid({super.key});
@@ -59,7 +61,27 @@ class _ShimmerImageGridState extends State<ShimmerImageGrid> with SingleTickerPr
                     ],
                   ),
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) => const CourseDetailPage(),
+                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                            const begin = Offset(1.0, 0.0); // từ bên phải sang
+                            const end = Offset.zero;
+                            const curve = Curves.ease;
+
+                            final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                            final offsetAnimation = animation.drive(tween);
+
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.white,
                       padding: EdgeInsets.zero,

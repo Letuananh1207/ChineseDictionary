@@ -27,13 +27,13 @@ class _StoryLobbyState extends State<StoryLobby> {
             const SizedBox(height: 10),
             _buildCard(
               title: "Gợi ý tìm kiếm",
-              imagePath: "hanzi_xiong.png", // Icon lịch sử tìm kiếm
+              imagePath: "logo.png", // Icon lịch sử tìm kiếm
               child: _buildSuggestions(),
             ),
             const SizedBox(height: 10),
             _buildCard(
               title: "Hán tự theo cấp độ",
-              imagePath: "hanzi_ma.png", // Icon lịch sử tìm kiếm
+              imagePath: "logo.png", // Icon lịch sử tìm kiếm
               child: _buildVocabularyLevels(),
             ),
           ],

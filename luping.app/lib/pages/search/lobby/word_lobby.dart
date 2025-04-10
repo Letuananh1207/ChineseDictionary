@@ -21,19 +21,19 @@ class _WordLobbyState extends State<WordLobby> {
           children: [
             _buildCard(
               title: "Lịch sử tìm kiếm",
-              imagePath: "animal_tiger.png", // Icon lịch sử tìm kiếm
+              imagePath: "logo.png", // Icon lịch sử tìm kiếm
               child: _buildHistoryList(),
             ),
             const SizedBox(height: 10),
             _buildCard(
               title: "Gợi ý tìm kiếm",
-              imagePath: "animal_chon.png", // Icon lịch sử tìm kiếm
+              imagePath: "logo.png", // Icon lịch sử tìm kiếm
               child: _buildSuggestions(),
             ),
             const SizedBox(height: 10),
             _buildCard(
               title: "Từ vựng theo cấp độ",
-              imagePath: "animal_pig.png", // Icon lịch sử tìm kiếm
+              imagePath: "logo.png", // Icon lịch sử tìm kiếm
               child: _buildVocabularyLevels(),
             ),
           ],
