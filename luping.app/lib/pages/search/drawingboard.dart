@@ -15,52 +15,136 @@ class _DrawingBoardState extends State<DrawingBoard> {
   @override
   void initState() {
     super.initState();
-    _handwriting = Handwriting(width: 300, height: 200);
+    _handwriting = Handwriting();
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 10),
         const Text(
           "Vẽ ký tự tiếng Trung ở đây",
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        Expanded(
-          child: GestureDetector(
-            onPanUpdate: (details) {
-              setState(() {
-                _points.add(details.localPosition);
-              });
-            },
-            onPanEnd: (details) {
-              _points.add(null);
-            },
-            child: CustomPaint(
-              size: Size.infinite,
-              painter: DrawingPainter(_points),
-            ),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            _recognizeHandwriting();
-          },
-          child: const Text("Nhận diện"),
-        ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         Text(
-          "Kết quả nhận diện: $_recognizedResult",
+          "Kết quả: $_recognizedResult",
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
+        const SizedBox(height: 10),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Container(
+              width: constraints.maxWidth, // 🔹 Chiều ngang tối đa
+              height: 250, // Chiều cao cố định
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade400),
+              ),
+              child: GestureDetector(
+                onPanUpdate: (details) {
+                  setState(() {
+                    _points.add(details.localPosition);
+                  });
+                },
+                onPanEnd: (details) {
+                  _points.add(null);
+                  _recognizeHandwriting();
+                },
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: DrawingPainter(_points),
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(width: 20,),
+            InkWell(
+              onTap: () {
+                Navigator.of(context).pop(); // 🔹 Đóng BottomSheet
+              },
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white, // 🔹 Nền trắng
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue, width: 1), // 🔹 Viền xanh
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1), // 🔹 Đổ bóng nhẹ
+                      blurRadius: 4,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.close, color: Colors.blue),
+                    const SizedBox(width: 5),
+                    const Text("Đóng", style: TextStyle(fontSize: 14, color: Colors.blue)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 20), // 🔹 Khoảng cách giữa 2 nút
+            Expanded(child: SizedBox()),
+            const SizedBox(width: 20), // 🔹 Khoảng cách giữa 2 nút
+
+            InkWell(
+              onTap: _clearBoard,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white, // 🔹 Nền trắng
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red, width: 1), // 🔹 Viền đỏ
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1), // 🔹 Đổ bóng nhẹ
+                      blurRadius: 4,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.delete, color: Colors.red),
+                    const SizedBox(width: 5),
+                    const Text("Xóa", style: TextStyle(fontSize: 14, color: Colors.red)),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(width: 20,),
+
+          ],
+        )
+
       ],
     );
   }
 
+
+  void _clearBoard() {
+    setState(() {
+      _points.clear();
+      _recognizedResult = "";
+    });
+  }
+
   void _recognizeHandwriting() {
     List<List<List<int>>> rawTrace = _convertPointsToTrace(_points);
-    print("Trace: $rawTrace");
 
     List<List<int>> trace = [];
     for (var stroke in rawTrace) {
@@ -80,12 +164,14 @@ class _DrawingBoardState extends State<DrawingBoard> {
       trace,
       options,
           (results, error) {
+        if (!mounted) return; // 🔹 Kiểm tra widget có còn tồn tại không
         setState(() {
           _recognizedResult = error != null ? "Error: ${error.toString()}" : results?.toString() ?? "No result";
         });
       },
     );
   }
+
 
   List<List<List<int>>> _convertPointsToTrace(List<Offset?> points) {
     List<List<List<int>>> trace = [];
@@ -135,15 +221,9 @@ class DrawingPainter extends CustomPainter {
 }
 
 class Handwriting {
-  final int width;
-  final int height;
-
-  Handwriting({required this.width, required this.height});
-
   void recognize(List<List<int>> trace, Map<String, dynamic> options, Function(dynamic, dynamic) callback) {
-    // Giả lập quá trình nhận diện chữ viết tay
     Future.delayed(const Duration(seconds: 1), () {
-      callback(["字", "汉"], null); // Kết quả giả định
+      callback(["字", "汉"], null); // 🔹 Kết quả giả định
     });
   }
 }

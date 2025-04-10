@@ -50,10 +50,10 @@ class _CommunityHomeState extends State<CommunityHome> {
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        shadowColor: Colors.transparent, // ✨ Không có bóng
+        surfaceTintColor: Colors.transparent, // ✨ Loại bỏ hiệu ứng đổi màu khi cuộn
         centerTitle: false,
-        title: _isSearching
-            ? _buildSearchField()
-            : Row(
+        title: _isSearching ? _buildSearchField() : Row(
           children: [
             const Icon(Icons.forum, color: Colors.green),
             const SizedBox(width: 8),
@@ -76,14 +76,9 @@ class _CommunityHomeState extends State<CommunityHome> {
                   Navigator.push(
                     context,
                     PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          CommunityGroup(),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
+                      pageBuilder: (context, animation, secondaryAnimation) => CommunityGroup(),
+                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
                       },
                     ),
                   );
