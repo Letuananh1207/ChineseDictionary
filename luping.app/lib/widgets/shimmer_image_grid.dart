@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:luping/pages/courses/course-detail-page.dart';
+import 'package:luping/pages/courses/course_detail_page.dart';
 
 
 class ShimmerImageGrid extends StatefulWidget {
@@ -65,9 +65,10 @@ class _ShimmerImageGridState extends State<ShimmerImageGrid> with SingleTickerPr
                       Navigator.push(
                         context,
                         PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 600), // 👈 Làm chậm hiệu ứng ở đây
                           pageBuilder: (context, animation, secondaryAnimation) => const CourseDetailPage(),
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(1.0, 0.0); // từ bên phải sang
+                            const begin = Offset(1.0, 0.0); // từ phải sang
                             const end = Offset.zero;
                             const curve = Curves.ease;
 

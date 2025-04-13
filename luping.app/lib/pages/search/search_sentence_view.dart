@@ -32,7 +32,7 @@ class SearchSentencesView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSentenceRow(item.sentences),
+            _buildSentenceRow(item.sentence),
             const SizedBox(height: 4),
             _buildPinyinText(item.pinyin),
             const SizedBox(height: 8),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:luping/pages/community/community_post.dart';
+import 'package:luping/pages/community/community_home_post.dart';
+import 'package:luping/pages/community/community_post_detail.dart';
+import 'package:luping/pages/community/community_post_form.dart';
 import 'community_group.dart';
 import 'community_data.dart';
 
@@ -23,13 +25,15 @@ class _CommunityHomeState extends State<CommunityHome> {
   }
 
   void _onScroll() {
-    bool isAtTop = _scrollController.offset <= 0;
+    // Nếu cuộn xuống một đoạn thì ẩn
+    bool isAtTop = _scrollController.offset < 20;
     if (isAtTop != _isAtTop) {
       setState(() {
         _isAtTop = isAtTop;
       });
     }
   }
+
 
   @override
   void dispose() {
@@ -55,10 +59,14 @@ class _CommunityHomeState extends State<CommunityHome> {
         centerTitle: false,
         title: _isSearching ? _buildSearchField() : Row(
           children: [
-            const Icon(Icons.forum, color: Colors.green),
+            Image.asset(
+              'assets/logo.png',
+              width: 24,
+              height: 24,
+            ),
             const SizedBox(width: 8),
             const Text(
-              'Hỏi đáp',
+              'Cộng đồng',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 17,
@@ -91,53 +99,54 @@ class _CommunityHomeState extends State<CommunityHome> {
       ),
       body: Column(
         children: [
-          if (_isAtTop)
-            AnimatedOpacity(
-              opacity: _isAtTop ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.grey.shade300,
-                      backgroundImage: NetworkImage("https://yt3.ggpht.com/rbC68rxBCANyVKnZLfaeMXT_iUvz2pmag2SBPSG5TAYvF7W-cfgLf7c7oqXcvPQYaRivlM-N=s88-c-k-c0x00ffffff-no-rj"),
-                      onBackgroundImageError: (_, __) {},
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                            ),
-                            builder: (context) => CommunityPost(),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.black26),
+          AnimatedSwitcher(
+            duration: Duration(milliseconds: 300),
+            child: _isAtTop
+                ? Padding(
+              key: ValueKey(true),
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.grey.shade300,
+                    backgroundImage: NetworkImage("https://yt3.ggpht.com/rbC68rxBCANyVKnZLfaeMXT_iUvz2pmag2SBPSG5TAYvF7W-cfgLf7c7oqXcvPQYaRivlM-N=s88-c-k-c0x00ffffff-no-rj"),
+                    onBackgroundImageError: (_, __) {},
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                           ),
-                          child: const Text(
-                            'Bạn đang suy nghĩ gì?',
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
-                          ),
+                          builder: (context) => CommunityPost(),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 15),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.black26),
+                        ),
+                        child: const Text(
+                          'Bạn đang suy nghĩ gì?',
+                          style: TextStyle(color: Colors.grey, fontSize: 14),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
+            )
+                : SizedBox.shrink(key: ValueKey(false)),
+          ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+            padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -170,12 +179,32 @@ class _CommunityHomeState extends State<CommunityHome> {
               itemCount: fakeData.where((post) => post["tag"] == _selectedTag || _selectedTag == "all").length,
               itemBuilder: (context, index) {
                 final post = fakeData.where((post) => post["tag"] == _selectedTag || _selectedTag == "all").toList()[index];
-                return buildPostCard(post);
+
+                return buildPostCard(
+                  context,
+                  post,
+                      () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (BuildContext context) {
+                        return Container(
+                          height: MediaQuery.of(context).size.height,
+                          color: Colors.white,
+                          child: SingleChildScrollView(
+                            child: CommunityPostDetail(post: post),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
               },
             ),
-          ),
+          )
         ],
       ),
+
     );
   }
 
@@ -218,72 +247,5 @@ class _CommunityHomeState extends State<CommunityHome> {
   }
 }
 
-
-Widget buildPostCard(Map<String, dynamic> post) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      elevation: 3,
-      color: Colors.white, // Đặt màu nền trắng
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(post["avatar"] ?? "https://via.placeholder.com/150"),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  post["author"] ?? "Unknown",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Text(post["content"] ?? "No content"),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(Icons.favorite_border, color: Colors.red),
-                const SizedBox(width: 5),
-                Text("${post["likes"] ?? 0}"),
-                const SizedBox(width: 15),
-                Icon(Icons.chat_bubble_outline, color: Colors.blueGrey),
-                const SizedBox(width: 5),
-                Text("${post["comments"] ?? 0}"),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Text(
-              post["time"] ?? "Unknown time",
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-
-  Widget _buildCircleIcon(IconData icon) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            shape: BoxShape.circle,
-          ),
-          padding: const EdgeInsets.all(8),
-          child: Icon(icon, color: Colors.black),
-        ),
-      ],
-    );
-  }
 
 

@@ -77,7 +77,7 @@ class _MainScreenState extends State<MainScreen> {
                     //         'assets/chatbot.svg', 'AI Chat', 4)),
                     Expanded(
                         child: _buildCustomBottomNavigationBarItem(
-                            'assets/community.svg', 'Hỏi đáp', 4)),
+                            'assets/community.svg', 'Cộng đồng', 4)),
                     Expanded(
                         child: _buildCustomBottomNavigationBarItem(
                             'assets/user.svg', 'Hồ sơ', 3)),
